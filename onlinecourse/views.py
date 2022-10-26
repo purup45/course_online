@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 # <HINT> Import any new Models here
-from .models import Course, Enrollment
+from .models import *
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
@@ -113,16 +113,22 @@ def enroll(request, course_id):
 def submit(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
     user = request.user
-    enroll = Enrollment.objects.get(user=user, course=course)
-    sub = Submission.objects.create(enrollment=enroll)
+    enrollment = Enrollment.objects.get(user=user, course=course)
+    submission= Submission.objects.create(enrollment=enrollment)
+    #if "extract_answers(request)" was selected/used 
+    # answers = extract_answers(request)
+    # submission.chocies.set(answers)
+    # submission.save()
+    
+
     # extract_answers(request)
     for key in request.POST:
         if key.startswith('choice'):
             value = request.POST[key]
             choice_id = int(value)
             choice_obj = get_object_or_404(Choice, pk=choice_id)
-            sub.choices.add(choice_obj)
-    return HttpResponseRedirect(reverse(viewname='onlinecourse:exam_result', args=(course.id, sub.id)))
+            submission.choices.add(choice_obj)
+    return HttpResponseRedirect(reverse(viewname='onlinecourse:exam_result', args=(course.id, submission.id)))
 
 
 
@@ -149,7 +155,7 @@ def show_exam_result(request, course_id, submission_id):
     selected_choices = submitted.choices.all()
     score = 0
     for choice in selected_choices:
-        if choice.correct == True:
+        if choice.is_correct == True:
             score  =score + 1
     grade=int((score/course.question_set.count())*100)
     context = {'course':course, 'submission':submitted, 'grade':grade}
