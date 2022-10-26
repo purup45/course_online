@@ -53,17 +53,17 @@
             <!--HINT Display exam results-->
             {% for question in course.question_set.all %}
             <div class="card mt-1">
-                <div class="card-header"><h5>{{question.question_text}}</h5></div>
+                <div class="card-header"><h5>{{question.q_text}}</h5></div>
                 <div class="card-body">
                     {% for choice in question.choice_set.all %}
-                        {% if choice.correct %}
+                        {% if choice.is_correct %}
                             {% if choice in submission.choices.all %}
-                                <div class="text-success">Correct Answer: {{ choice.choice_content }}</div>
+                                <div class="text-success">Correct Answer: {{ choice.choice }}</div>
                             {% else %}
-                                <div class="text-warning">Not selected: {{ choice.choice_content }}</div>
+                                <div class="text-warning">Not selected: {{ choice.choice }}</div>
                             {% endif %}
                         {% else %}
-                            <div>{{ choice.choice_content }}</div>
+                            <div>{{ choice.choice }}</div>
                         {% endif %}
                     {% endfor %}
                 </div>
